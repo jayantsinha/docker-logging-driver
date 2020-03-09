@@ -30,6 +30,9 @@ func main() {
 
 	h := sdk.NewHandler(`{"Implements": ["LoggingDriver"]}`)
 	handlers(&h, newDriver())
+	if os.Getenv("WEBHOOK_URL") == "" {
+		fmt.Errorf("Env WEBHOOK_URL not set! To send logs to a webhook, set this variable.")
+	}
 	fmt.Println("Starting HTTP listener...")
 	if err := h.ServeUnix("jsonfile", 0); err != nil {
 		panic(err)

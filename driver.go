@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
@@ -113,6 +116,19 @@ func consumeLog(lf *logPair) {
 		if err := lf.logger.Log(&msg); err != nil {
 			logrus.WithField("id", lf.info.ContainerID).WithError(err).WithField("message", msg).Error("error writing log message")
 			continue
+		}
+
+		if os.Getenv("WEBHOOK_URL") != "" {
+			logMsg, _ := json.Marshal(msg)
+			reqBody, _ := json.Marshal(map[string]string{
+				"text": string(logMsg),
+			})
+
+			resp, err := http.Post(WebhookURL, "application/json", bytes.NewBuffer(reqBody))
+			if err != nil {
+				fmt.Println("Error sending log to slack webhook", err)
+			}
+			resp.Body.Close()
 		}
 
 		buf.Reset()

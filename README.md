@@ -4,7 +4,13 @@ A logging driver for docker
 
 This is a docker logging plugin in its simplest form. You can compile and build the plugin from source and install it using the following 3 steps.
 
-### 1. Build an image and extract rootfs
+### 1. Build the code
+
+Since the Dockerfile uses scratch image, you need to cross compile the code for linux with all the dependencies installed
+
+`$ CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o docker-logging-driver .`
+
+### 2. Build an image and extract rootfs
 
 Build an image:
 
@@ -22,14 +28,14 @@ Export rootfs to the plugin directory:
 
 `$ docker container export tmp | tar -x -C ./plugin/rootfs`
 
-### 2. Add plugin config
+### 3. Add plugin config
 ```
 $ cp config.json ./plugin/
 $ ls ./plugin
 config.json 	rootfs/
 ```
 
-### 3. Create plugin
+### 4. Create plugin
 ```
 $ docker plugin create jayantsinha/docker-logging-plugin ./plugin
 $docker plugin ls

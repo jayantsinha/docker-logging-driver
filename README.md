@@ -4,13 +4,19 @@ A logging driver for docker
 
 This is a docker logging plugin in its simplest form. You can compile and build the plugin from source and install it using the following 3 steps.
 
-### 1. Build the code
+### 1. Set the environment variable WEBHOOK_URL
+
+Since we need slack end point, we need to set environment varialbe
+
+`$ export WEBHOOK_URL="http://someslack.end.point"`
+
+### 2. Build the code
 
 Since the Dockerfile uses scratch image, you need to cross compile the code for linux with all the dependencies installed
 
 `$ CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o docker-logging-driver .`
 
-### 2. Build an image and extract rootfs
+### 3. Build an image and extract rootfs
 
 Build an image:
 
@@ -28,14 +34,14 @@ Export rootfs to the plugin directory:
 
 `$ docker container export tmp | tar -x -C ./plugin/rootfs`
 
-### 3. Add plugin config
+### 4. Add plugin config
 ```
 $ cp config.json ./plugin/
 $ ls ./plugin
 config.json 	rootfs/
 ```
 
-### 4. Create plugin
+### 5. Create plugin
 ```
 $ docker plugin create jayantsinha/docker-logging-plugin ./plugin
 $docker plugin ls

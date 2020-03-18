@@ -118,18 +118,16 @@ func consumeLog(lf *logPair) {
 			continue
 		}
 
-		if os.Getenv("WEBHOOK_URL") != "" {
-			logMsg, _ := json.Marshal(msg)
-			reqBody, _ := json.Marshal(map[string]string{
-				"text": string(logMsg),
-			})
+		logMsg, _ := json.Marshal(msg)
+		reqBody, _ := json.Marshal(map[string]string{
+			"text": string(logMsg),
+		})
 
-			resp, err := http.Post(WebhookURL, "application/json", bytes.NewBuffer(reqBody))
-			if err != nil {
-				fmt.Println("Error sending log to slack webhook", err)
-			}
-			resp.Body.Close()
+		resp, err := http.Post(os.Getenv("WEBHOOK_URL"), "application/json", bytes.NewBuffer(reqBody))
+		if err != nil {
+			fmt.Println("Error sending log to slack webhook", err)
 		}
+		resp.Body.Close()
 
 		buf.Reset()
 	}
